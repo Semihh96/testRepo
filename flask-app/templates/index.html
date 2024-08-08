@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        #chat-bot-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #272727;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        #chat-bot-button::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(39, 39, 39, 0.5);
+            border-radius: 50%;
+            animation: pulse 1.6s infinite ease-out;
+            z-index: -1;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        #chatbot-container {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 450px;
+            max-width: 100%;
+            height: 550px;
+            border: 1px solid #ccc;
+            background: white;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background-color: #272727;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header img {
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .header .cfplt-widget__dialog-head-text {
+            font-size: 16px;
+            flex: 1;
+        }
+
+        #chat-box {
+            padding: 10px;
+            overflow-y: auto;
+            flex: 1;
+            background: #f9f9f9;
+        }
+
+        #user-input-container {
+            display: flex;
+            border-top: 1px solid #ccc;
+            background: #f1f1f1;
+            padding: 5px;
+        }
+
+        #user-login {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            border-radius: 0;
+            outline: none;
+            font-size: 14px;
+        }
+
+        #send-button {
+            background-color: #272727;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-left: 5px;
+        }
+
+        .message {
+            margin: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 80%;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            background-color: #dcf8c6;
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message.bot {
+            background-color: #f1f0f0;
+            align-self: flex-start;
+        }
+
+        .message .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .message.bot .avatar {
+            margin-left: 10px;
+            margin-right: 0;
+        }
+
+        .message .text {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .cfplt-widget__button {
+            background-color: #efefef;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+
+        .cfplt-widget__button:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="chat-bot-button" onclick="toggleChatbot()"><img src="{{ url_for('static', filename='images/logo.png') }}" alt="MipoBot" width="40" height="40" style="background-color: white; border-radius: 80px;"></button>
+    <div id="chatbot-container">
+        <div class="header">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MipoBot" width="40" height="40" style="background-color: white;">
+
+            <div class="cfplt-widget__dialog-head-text">Mipo Bot</div>
+            <button onclick="toggleChatbot()">X</button>
+        </div>
+        <div id="chat-box"></div>
+        <div id="user-input-container">
+            <input type="text" id="user-login" placeholder="Mesajınızı Giriniz">
+            <button id="send-button" onclick="sendMessage()">Gönder</button>
+        </div>
+    </div>
+    <script>
+        function toggleChatbot() {
+            const chatbotContainer = document.getElementById('chatbot-container');
+            if (chatbotContainer.style.display === 'none' || chatbotContainer.style.display === '') {
+                chatbotContainer.style.display = 'flex';
+            } else {
+                chatbotContainer.style.display = 'none';
+            }
+        }
+
+        async function sendMessage() {
+            const userInput = document.getElementById('user-login').value;
+            if (userInput.trim() === '') return;
+            const chatbox = document.getElementById('chat-box');
+            chatbox.innerHTML += `
+                <div class="message user">
+                    <div class="text"><strong>You:</strong> ${userInput}</div>
+                </div>`;
+            document.getElementById('user-login').value = '';
+
+            const response = await fetch('/chat/message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: userInput })
+            });
+            const data = await response.json();
+            chatbox.innerHTML += `
+                <div class="message bot">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Bot" class="avatar" style="margin-left: auto;">
+                    <div class="text" style="margin-top: inherit;"><strong>:</strong> ${data.response}</div>
+                </div>`;
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+    </script>
+</body>
+
+</html>
