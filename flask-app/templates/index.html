@@ -31,7 +31,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
-        #chat-bot-button::before {
+        #chat-bot-button.pulsing::before {
             content: '';
             position: absolute;
             inset: 0;
@@ -190,19 +190,63 @@
         .cfplt-widget__button:hover {
             background-color: #ddd;
         }
+
+        .favorite.styled,
+        .remove-favorite-styled {
+            line-height: 2.5;
+            padding: 0 20px;
+            font-size: 1rem;
+            text-align: center;
+            color: #fff;
+            text-shadow: 1px 1px 1px #000;
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            background-image: linear-gradient(
+                to top left,
+                rgba(0, 0, 0, 0.2),
+                rgba(0, 0, 0, 0.2) 30%,
+                rgba(0, 0, 0, 0)
+            );
+            box-shadow:
+                inset 2px 2px 3px rgba(255, 255, 255, 0.6),
+                inset -2px -2px 3px rgba(0, 0, 0, 0.6);
+            margin: 10px;
+        }
+
+        .favorite.styled:hover,
+        .remove-favorite-styled:hover {
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .favorite.styled:active,
+        .remove-favorite-styled:active {
+            box-shadow:
+                inset -2px -2px 3px rgba(255, 255, 255, 0.6),
+                inset 2px 2px 3px rgba(0, 0, 0, 0.6);
+        }
+        .chat-buttons {
+            display: flex;
+            flex-direction: column;
+            margin-top: auto;
+        }    
     </style>
 </head>
 
 <body>
-    <button id="chat-bot-button" onclick="toggleChatbot()"><img src="{{ url_for('static', filename='images/logo.png') }}" alt="MipoBot" width="40" height="40" style="background-color: white; border-radius: 80px;"></button>
+    <button id="chat-bot-button" class="pulsing" onclick="toggleChatbot()"><img src="{{ url_for('static', filename='images/logo.png') }}" alt="MipoBot" width="40" height="40" style="background-color: white; border-radius: 80px;"></button>
     <div id="chatbot-container">
         <div class="header">
             <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MipoBot" width="40" height="40" style="background-color: white;">
-
             <div class="cfplt-widget__dialog-head-text">Mipo Bot</div>
             <button onclick="toggleChatbot()">X</button>
         </div>
+        <div id="chat-buttons">
+            <button class="favorite styled" type="button">Sıkça Sorulan Sorular</button>
+            <button class="remove-favorite-styled" type="button" style="width: 45%;">Son Sorulanlar</button>
+        </div>
         <div id="chat-box"></div>
+
+        
         <div id="user-input-container">
             <input type="text" id="user-login" placeholder="Mesajınızı Giriniz">
             <button id="send-button" onclick="sendMessage()">Gönder</button>
@@ -211,10 +255,13 @@
     <script>
         function toggleChatbot() {
             const chatbotContainer = document.getElementById('chatbot-container');
+            const chatButton = document.getElementById('chat-bot-button');
             if (chatbotContainer.style.display === 'none' || chatbotContainer.style.display === '') {
                 chatbotContainer.style.display = 'flex';
+                chatButton.classList.remove('pulsing'); // Animasyonu durdur
             } else {
                 chatbotContainer.style.display = 'none';
+                chatButton.classList.add('pulsing'); // Animasyonu tekrar başlat
             }
         }
 
