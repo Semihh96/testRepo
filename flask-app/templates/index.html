@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -224,46 +225,73 @@
                 inset -2px -2px 3px rgba(255, 255, 255, 0.6),
                 inset 2px 2px 3px rgba(0, 0, 0, 0.6);
         }
+
         .chat-buttons {
             display: flex;
             flex-direction: column;
             margin-top: auto;
-        }    
+        }
+
+        .header button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .header button:hover {
+            color: #ddd;
+        }
     </style>
 </head>
 
 <body>
-    <button id="chat-bot-button" class="pulsing" onclick="toggleChatbot()"><img src="{{ url_for('static', filename='images/logo.png') }}" alt="MipoBot" width="40" height="40" style="background-color: white; border-radius: 80px;"></button>
+    <button id="chat-bot-button" onclick="toggleChatbot()">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MipoBot" width="40" height="40" style="background-color: white; border-radius: 80px;">
+    </button>
     <div id="chatbot-container">
         <div class="header">
             <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MipoBot" width="40" height="40" style="background-color: white;">
             <div class="cfplt-widget__dialog-head-text">Mipo Bot</div>
-            <button onclick="toggleChatbot()">X</button>
+            <button onclick="toggleChatbot()"><i class="fas fa-times"></i></button>
         </div>
         <div id="chat-buttons">
             <button class="favorite styled" type="button">Sıkça Sorulan Sorular</button>
             <button class="remove-favorite-styled" type="button" style="width: 45%;">Son Sorulanlar</button>
         </div>
         <div id="chat-box"></div>
-
-        
         <div id="user-input-container">
             <input type="text" id="user-login" placeholder="Mesajınızı Giriniz">
             <button id="send-button" onclick="sendMessage()">Gönder</button>
         </div>
     </div>
     <script>
+        const chatButton = document.getElementById('chat-bot-button');
+
         function toggleChatbot() {
             const chatbotContainer = document.getElementById('chatbot-container');
-            const chatButton = document.getElementById('chat-bot-button');
             if (chatbotContainer.style.display === 'none' || chatbotContainer.style.display === '') {
                 chatbotContainer.style.display = 'flex';
-                chatButton.classList.remove('pulsing'); // Animasyonu durdur
+                chatButton.classList.remove('pulsing'); // Stop animation when chatbot is open
             } else {
                 chatbotContainer.style.display = 'none';
-                chatButton.classList.add('pulsing'); // Animasyonu tekrar başlat
+                chatButton.classList.add('pulsing'); // Start animation when chatbot is closed
             }
         }
+
+        function startPulsing() {
+            chatButton.classList.add('pulsing');
+        }
+
+        function stopPulsing() {
+            chatButton.classList.remove('pulsing');
+        }
+
+        // Add event listeners for mouse events
+        chatButton.addEventListener('mouseover', startPulsing);
+        chatButton.addEventListener('mouseout', stopPulsing);
 
         async function sendMessage() {
             const userInput = document.getElementById('user-login').value;
@@ -271,7 +299,7 @@
             const chatbox = document.getElementById('chat-box');
             chatbox.innerHTML += `
                 <div class="message user">
-                    <div class="text"><strong>You:</strong> ${userInput}</div>
+                    <div class="text" style= "text-align:right;"><strong>You:</strong> ${userInput}</div>
                 </div>`;
             document.getElementById('user-login').value = '';
 
@@ -285,8 +313,7 @@
             const data = await response.json();
             chatbox.innerHTML += `
                 <div class="message bot">
-                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Bot" class="avatar" style="margin-left: auto;">
-                    <div class="text" style="margin-top: inherit;"><strong>:</strong> ${data.response}</div>
+                    <div class="text" style="margin-top: inherit;"><strong></strong> ${data.response}</div>
                 </div>`;
             chatbox.scrollTop = chatbox.scrollHeight;
         }
