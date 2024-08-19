@@ -85,14 +85,14 @@ class TextClassifier:
         predictions = self.rfc.predict(texts_tfidf)
         probs = self.rfc.predict_proba(texts_tfidf)
         
-        """ 
+
         for i in range(len(texts)):
             print(f"Text: {texts[i]}")
             print(f"Prediction: {predictions[i]}")
             probs_percent = [f"{prob * 100:.2f}%" for prob in probs[i]]
             print(f"Probabilities: {', '.join(probs_percent)}")
             print()
-        """
+
         return predictions[0]
 
 def main():

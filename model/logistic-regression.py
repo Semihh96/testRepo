@@ -27,9 +27,9 @@ df['tag'] = df['tag'].fillna('Unknown')
 # Veri çerçevesinin ilk birkaç satırını yazdırın
 print(df.head())
 
-# Stop words ve noktalama işaretlerini temizleme fonksiyonu
+
 def preprocess_text(text):
-    if isinstance(text, str):  # Sadece metin verileri üzerinde işlem yap
+    if isinstance(text, str):
         text = text.lower()
         text = text.translate(str.maketrans('', '', string.punctuation))
         words = word_tokenize(text)
@@ -40,7 +40,7 @@ def preprocess_text(text):
         stemmed_words = [stemmer.stem(word) for word in cleaned_words]
         return ' '.join(stemmed_words)
     else:
-        return ''  # Sayısal verileri boş string ile değiştirme
+        return '' 
 
 # 'response' ve 'tag' sütunlarını temizleme
 df['tag'] = df['response'].apply(preprocess_text)
